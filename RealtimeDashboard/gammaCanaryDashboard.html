@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>gamma canary</title>
+  <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.5.0.js"></script>
+  <script type="text/javascript" src="https://pubnub.github.io/eon/v/eon/1.0.0/eon.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://pubnub.github.io/eon/v/eon/1.0.0/eon.css" />
+<style>
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  background-color: #2196F3;
+  padding: 10px;
+}
+.grid-item {
+  background-color: DodgerBlue;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+  font-family: "Comic Sans MS";
+  color: yellow;
+}
+.grid-item1 {
+  background-color: DodgerBlue;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+  height: 150px;
+}
+.grid-item3{
+  background-color: DodgerBlue;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+  height: 150px;
+}
+.grid-item2{
+  background-color: DodgerBlue;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  text-align: center;
+  font-family: "Comic Sans MS";
+  color: yellow;
+
+  height: 150px;
+}
+#map {
+  height: 575px;
+  border: 3px solid Blue;
+}
+#cpmChart .c3-line-data {
+  stroke-width: 5px;
+}
+
+.myButtonTweet {
+	-moz-box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #3d94f6), color-stop(1, #1e62d0));
+	background:-moz-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:-webkit-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:-o-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:-ms-linear-gradient(top, #3d94f6 5%, #1e62d0 100%);
+	background:linear-gradient(to bottom, #3d94f6 5%, #1e62d0 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#3d94f6', endColorstr='#1e62d0',GradientType=0);
+	background-color:#3d94f6;
+	-moz-border-radius:33px;
+	-webkit-border-radius:33px;
+	border-radius:33px;
+	border:1px solid #337fed;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:32px 44px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #1570cd;
+}
+.myButtonTweet:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #1e62d0), color-stop(1, #3d94f6));
+	background:-moz-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:-webkit-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:-o-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:-ms-linear-gradient(top, #1e62d0 5%, #3d94f6 100%);
+	background:linear-gradient(to bottom, #1e62d0 5%, #3d94f6 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1e62d0', endColorstr='#3d94f6',GradientType=0);
+	background-color:#1e62d0;
+}
+.myButtonTweet:active {
+	position:relative;
+	top:1px;
+}
+
+input[type=text] {
+    width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 3px solid black;
+    border-radius: 8px;
+    font-size: 30px;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="grid-container">
+  <div class="grid-item1">
+    <p></p>
+    <p></p>
+    <img id="myImage0" src="radsymbol.png"  width="64" height="64">
+  </div>
+  <div class="grid-item2">
+    <p><font size="55"> <i>gamma canary</i> dashboard </font></p>
+    <p> </p>
+  </div>
+  <div class="grid-item3">
+    <p></p>
+    <p></p>
+    <img id="myImage0" src="radsymbol.png"  width="64" height="64">
+  </div>
+  <div class="grid-item">
+    <p><font size="35"> <i>gamma</i> Counts </font></p>
+    <div id="cpmGauge"></div>
+    <p> CPM </p>
+  </div>
+  <div class="grid-item">
+    <p><font size="35"> Geographic Location </font></p>
+    <div id="map"></div>
+    <p> </p>
+  </div>
+  <div class="grid-item">
+    <p><font size="35"> Fuel Gauge </font></p>
+    <div id="batterySOCGauge"></div>
+    <p>State of Charge</p>
+    <div id="batteryTempGauge"></div>
+    <p>Battery Temperature(&degC)</p>
+  </div>
+  <div class="grid-item">
+    <p> </p>
+    <p><font size="35"> Tweet! </font></p>
+    <button class="myButtonTweet"><img src="blueBird.png" onclick="tweetData()"></button>
+    <p> </p>
+  </div>
+  <div class="grid-item">
+    <p><font size="35"> <i>gamma</i> Counts Timeline </font></p>
+    <div id="cpmChart"></div>
+    <p> </p>
+  </div>
+  <div class="grid-item">
+    <p> </p>
+    <p><font size="35"> SMS </font></p>
+    <button class="myButtonTweet"><img src="redPhone.png" onclick="smsData()"></button>
+    <p> </p>
+    <input type="text" id="phoneNumber">
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  var channel1 = 'myMap';
+  var channel2 = 'radData';
+  var channel3 = 'batterySOC';
+  var channel4 = 'batteryTTE';
+  var channel5 = 'batteryTemp';
+
+  var pn = new PubNub({
+    publishKey:   'YOUR PUB KEY HERE', // replace with your own pub-key
+    subscribeKey: 'YOUR SUB KEY HERE'  // replace with your own sub-key
+  });
+
+  var map = eon.map({
+    pubnub: pn,
+    id: 'map',
+    mbToken: 'YOUR mapbox TOKEN HERE',
+    mbId: 'mapbox.streets',
+    center: [40.500000,-74.600000],
+    channels: [channel1],
+    connect: connect,
+    marker: function (latlng, data) {
+      var marker = new L.Marker(latlng, {
+        icon: L.icon({
+          iconUrl: 'radsymbol.png',
+          iconSize: [32, 32]
+        })
+      });
+
+      return marker;
+    }
+  });
+
+  function connect() {
+    var point = {
+      latlng: [40.000000, -74.000000]
+    };
+  };
+
+  eon.chart({
+  pubnub: pn,
+  channels: [channel2],
+  generate: {
+      bindto: '#cpmGauge',
+      size: {
+        height: 300,
+        width: 250,
+      },
+      data: {
+          labels: true,
+          type:'bar',
+          colors:{"CPM":"#0BFF01"},
+        },
+        bar: {
+          min: 0,
+          max: 500
+        },
+        color: {
+          pattern:['#F6C600','#FF0000','#FF0000'],
+          threshold: {
+            values: [25, 50 , 450]
+          }
+        }
+      }
+    });
+
+    eon.chart({
+      pubnub: pn,
+      channels: [channel3],
+      generate: {
+        bindto: '#batterySOCGauge',
+        size: {
+          height: 150,
+          width:  250,
+        },
+        data: {
+          type: 'gauge',
+          labels:true,
+        },
+        gauge: {
+          min: 0,
+          max: 100
+        },
+        color: {
+          pattern: ['#FF0000', '#F6C600', '#60B044'],
+          threshold: {
+            values: [30, 60, 90]
+          }
+        }
+      }
+    });
+
+    eon.chart({
+      pubnub: pn,
+      channels: [channel5],
+      generate: {
+        bindto: '#batteryTempGauge',
+        size: {
+          height: 150,
+          width:  250,
+        },
+        data: {
+            labels: true,
+            type:'bar',
+            colors:{"Temp":"#FF3333"},
+          },
+          bar: {
+            min: 0,
+            max: 45
+          },
+          color: {
+            pattern:['#F6C600','#FF0000','#FF0000'],
+            threshold: {
+              values: [10,25,35]
+            }
+          }
+
+
+
+      }
+    });
+
+
+
+    eon.chart({
+      pubnub: pn,
+      channels: [channel2],
+      history: true,
+      flow: true,
+      generate: {
+        bindto: '#cpmChart',
+        data: {
+          labels: true,
+          colors:{"CPM":"#0BFF01"},
+        },
+        axis: {
+          y: {
+            label: { // ADD
+              text: 'CPM',
+              position: 'outer-middle'
+            }
+          }
+        }
+      }
+    });
+
+    function tweetData()
+    {
+        console.log("Request tweet CPM & Location Data");
+        pn.publish({
+            channel:'canaryTweet',
+            message:
+            {
+                "request":"tweet"
+            }
+        });
+    }
+
+    function smsData()
+    {
+      console.log("Request sms CPM & Location Data");
+      var phoneNum = document.getElementById("phoneNumber").value
+      pn.publish({
+          channel:'canaryTweet',
+          message:
+          {
+              "request":"sms",
+              "number": phoneNum
+          }
+      });
+    }
+
+
+</script>
+</script>
+</body>
+</html>
